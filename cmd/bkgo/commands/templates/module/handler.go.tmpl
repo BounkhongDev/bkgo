@@ -2,9 +2,11 @@ package {{.Package}}
 
 import (
 	"log/slog"
+	"strconv"
 
 	"github.com/BounkhongDev/bkgo/errs"
 	"github.com/BounkhongDev/bkgo/i18n"
+	"github.com/BounkhongDev/bkgo/paginate"
 	"github.com/BounkhongDev/bkgo/response"
 	"github.com/gofiber/fiber/v2"
 )
@@ -28,11 +30,22 @@ func (h *{{.Name}}Handler) RegisterRoutes(r fiber.Router) {
 }
 
 func (h *{{.Name}}Handler) GetAll(c *fiber.Ctx) error {
-	result, err := h.usecase.GetAll(c.Context())
+	p := paginate.Params{
+		Page:  toInt(c.Query("page"), 1),
+		Limit: toInt(c.Query("limit"), 20),
+	}
+	list, total, err := h.usecase.List(c.Context(), p)
 	if err != nil {
 		return httpErr(c, err)
 	}
-	return c.JSON(response.Success(result))
+	return c.JSON(response.Paginated(list, p.Page, p.Limit, total))
+}
+
+func toInt(s string, def int) int {
+	if v, err := strconv.Atoi(s); err == nil && v > 0 {
+		return v
+	}
+	return def
 }
 
 func (h *{{.Name}}Handler) GetByID(c *fiber.Ctx) error {

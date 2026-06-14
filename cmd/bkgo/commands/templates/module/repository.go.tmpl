@@ -29,12 +29,17 @@ func (r *{{.LowerName}}Repository) FindByID(ctx context.Context, id string) (*{{
 	return &entity, nil
 }
 
-func (r *{{.LowerName}}Repository) FindAll(ctx context.Context) ([]*{{.Name}}, error) {
+func (r *{{.LowerName}}Repository) FindAll(ctx context.Context, offset, limit int) ([]*{{.Name}}, int64, error) {
 	var list []*{{.Name}}
-	if err := r.db.Session(ctx).Order("created_at desc").Find(&list).Error; err != nil {
-		return nil, err
+	var total int64
+	db := r.db.Session(ctx).Model(&{{.Name}}{})
+	if err := db.Count(&total).Error; err != nil {
+		return nil, 0, err
 	}
-	return list, nil
+	if err := db.Order("created_at desc").Offset(offset).Limit(limit).Find(&list).Error; err != nil {
+		return nil, 0, err
+	}
+	return list, total, nil
 }
 
 func (r *{{.LowerName}}Repository) Create(ctx context.Context, entity *{{.Name}}) error {

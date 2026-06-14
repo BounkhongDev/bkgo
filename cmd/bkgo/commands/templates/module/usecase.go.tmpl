@@ -1,18 +1,23 @@
 package {{.Package}}
 
-import "context"
+import (
+	"context"
+
+	"github.com/BounkhongDev/bkgo/paginate"
+	"github.com/BounkhongDev/bkgo/validator"
+)
 
 // {{.Name}}Usecase defines the business operations for {{.Name}}.
 type {{.Name}}Usecase interface {
 	GetByID(ctx context.Context, id string) (*{{.Name}}, error)
-	GetAll(ctx context.Context) ([]*{{.Name}}, error)
+	List(ctx context.Context, p paginate.Params) ([]*{{.Name}}, int64, error)
 	Create(ctx context.Context, input *Create{{.Name}}Input) (*{{.Name}}, error)
 	Update(ctx context.Context, id string, input *Update{{.Name}}Input) (*{{.Name}}, error)
 	Delete(ctx context.Context, id string) error
 }
 
 type Create{{.Name}}Input struct {
-	// TODO: define fields
+	// TODO: define fields e.g. Name string `validate:"required,min=2"`
 }
 
 type Update{{.Name}}Input struct {
@@ -31,11 +36,15 @@ func (u *{{.LowerName}}Usecase) GetByID(ctx context.Context, id string) (*{{.Nam
 	return u.repo.FindByID(ctx, id)
 }
 
-func (u *{{.LowerName}}Usecase) GetAll(ctx context.Context) ([]*{{.Name}}, error) {
-	return u.repo.FindAll(ctx)
+func (u *{{.LowerName}}Usecase) List(ctx context.Context, p paginate.Params) ([]*{{.Name}}, int64, error) {
+	p.Normalize()
+	return u.repo.FindAll(ctx, p.Offset(), p.Limit)
 }
 
 func (u *{{.LowerName}}Usecase) Create(ctx context.Context, input *Create{{.Name}}Input) (*{{.Name}}, error) {
+	if err := validator.Validate(input); err != nil {
+		return nil, err
+	}
 	entity := &{{.Name}}{
 		// TODO: map input to entity
 	}
@@ -46,6 +55,9 @@ func (u *{{.LowerName}}Usecase) Create(ctx context.Context, input *Create{{.Name
 }
 
 func (u *{{.LowerName}}Usecase) Update(ctx context.Context, id string, input *Update{{.Name}}Input) (*{{.Name}}, error) {
+	if err := validator.Validate(input); err != nil {
+		return nil, err
+	}
 	entity, err := u.repo.FindByID(ctx, id)
 	if err != nil {
 		return nil, err
@@ -58,5 +70,8 @@ func (u *{{.LowerName}}Usecase) Update(ctx context.Context, id string, input *Up
 }
 
 func (u *{{.LowerName}}Usecase) Delete(ctx context.Context, id string) error {
+	if _, err := u.repo.FindByID(ctx, id); err != nil {
+		return err
+	}
 	return u.repo.Delete(ctx, id)
 }
