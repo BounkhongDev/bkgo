@@ -1,13 +1,19 @@
 package {{.Package}}
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 // {{.Name}} is the core domain entity.
 type {{.Name}} struct {
-	ID        string `json:"id"`
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
+	ID        string    `json:"id"         gorm:"primaryKey;type:uuid;default:gen_random_uuid()"`
+	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
+	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
 }
+
+// TableName sets the PostgreSQL table name.
+func ({{.Name}}) TableName() string { return "{{.Table}}" }
 
 // {{.Name}}Repository is the port (interface) for {{.Name}} persistence.
 // Implement this with any database adapter.

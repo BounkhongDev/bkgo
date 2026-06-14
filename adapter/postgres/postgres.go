@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/bounkhongdev/kbgo/config"
-	"github.com/bounkhongdev/kbgo/contract"
+	"github.com/BounkhongDev/bkgo/config"
+	"github.com/BounkhongDev/bkgo/contract"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )

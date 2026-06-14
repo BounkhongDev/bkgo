@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/bounkhongdev/kbgo/response"
+	"github.com/BounkhongDev/bkgo/response"
 )
 
 func TestSuccess(t *testing.T) {

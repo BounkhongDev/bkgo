@@ -3,7 +3,7 @@ package validator_test
 import (
 	"testing"
 
-	"github.com/bounkhongdev/kbgo/validator"
+	"github.com/BounkhongDev/bkgo/validator"
 )
 
 type createInput struct {

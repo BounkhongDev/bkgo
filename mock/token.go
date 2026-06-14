@@ -3,7 +3,7 @@ package mock
 import (
 	"time"
 
-	"github.com/bounkhongdev/kbgo/contract"
+	"github.com/BounkhongDev/bkgo/contract"
 )
 
 // Token is a test double for contract.Token.

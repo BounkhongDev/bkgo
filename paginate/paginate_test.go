@@ -3,7 +3,7 @@ package paginate_test
 import (
 	"testing"
 
-	"github.com/bounkhongdev/kbgo/paginate"
+	"github.com/BounkhongDev/bkgo/paginate"
 )
 
 func TestNormalize(t *testing.T) {

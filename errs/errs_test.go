@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/bounkhongdev/kbgo/errs"
+	"github.com/BounkhongDev/bkgo/errs"
 )
 
 func TestNew(t *testing.T) {

@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/bounkhongdev/kbgo/contract"
+	"github.com/BounkhongDev/bkgo/contract"
 	"github.com/jackc/pgx/v5"
 )
 

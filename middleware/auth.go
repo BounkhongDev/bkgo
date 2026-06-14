@@ -3,9 +3,9 @@ package middleware
 import (
 	"strings"
 
-	"github.com/bounkhongdev/kbgo/contract"
-	"github.com/bounkhongdev/kbgo/i18n"
-	"github.com/bounkhongdev/kbgo/response"
+	"github.com/BounkhongDev/bkgo/contract"
+	"github.com/BounkhongDev/bkgo/i18n"
+	"github.com/BounkhongDev/bkgo/response"
 	"github.com/gofiber/fiber/v2"
 )
 

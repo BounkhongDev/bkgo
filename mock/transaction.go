@@ -3,7 +3,7 @@ package mock
 import (
 	"context"
 
-	"github.com/bounkhongdev/kbgo/contract"
+	"github.com/BounkhongDev/bkgo/contract"
 )
 
 // Tx is a test double for contract.Tx.

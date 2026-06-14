@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/bounkhongdev/kbgo/config"
+	"github.com/BounkhongDev/bkgo/config"
 	goredis "github.com/redis/go-redis/v9"
 )
 

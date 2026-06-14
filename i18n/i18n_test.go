@@ -3,7 +3,7 @@ package i18n_test
 import (
 	"testing"
 
-	"github.com/bounkhongdev/kbgo/i18n"
+	"github.com/BounkhongDev/bkgo/i18n"
 )
 
 func TestTranslate_KnownCode(t *testing.T) {

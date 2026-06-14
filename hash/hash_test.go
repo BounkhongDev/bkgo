@@ -3,7 +3,7 @@ package hash_test
 import (
 	"testing"
 
-	"github.com/bounkhongdev/kbgo/hash"
+	"github.com/BounkhongDev/bkgo/hash"
 )
 
 func TestPassword(t *testing.T) {

@@ -1,16 +1,15 @@
 package main
 
 import (
-	"context"
 	"log/slog"
 	"os"
 
-	"github.com/bounkhongdev/kbgo/adapter/jwt"
-	"github.com/bounkhongdev/kbgo/adapter/postgres"
-	"github.com/bounkhongdev/kbgo/adapter/redis"
-	"github.com/bounkhongdev/kbgo/config"
-	"github.com/bounkhongdev/kbgo/logger"
-	"github.com/bounkhongdev/kbgo/middleware"
+	gormadapter "github.com/BounkhongDev/bkgo/adapter/gorm"
+	"github.com/BounkhongDev/bkgo/adapter/jwt"
+	"github.com/BounkhongDev/bkgo/adapter/redis"
+	"github.com/BounkhongDev/bkgo/config"
+	"github.com/BounkhongDev/bkgo/logger"
+	"github.com/BounkhongDev/bkgo/middleware"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -27,16 +26,14 @@ func main() {
 	}
 	slog.SetDefault(log)
 
-	ctx := context.Background()
-
-	db, err := postgres.New(ctx, cfg.Postgres)
+	db, err := gormadapter.New(cfg.Postgres)
 	if err != nil {
 		slog.Error("postgres connect failed", "error", err)
 		os.Exit(1)
 	}
 	defer db.Close()
 
-	cache, err := redis.New(ctx, cfg.Redis)
+	cache, err := redis.New(cfg.Redis)
 	if err != nil {
 		slog.Error("redis connect failed", "error", err)
 		os.Exit(1)
@@ -63,7 +60,6 @@ func main() {
 	// userHandler.RegisterRoutes(api)
 	_ = api
 
-	_ = db
 	_ = cache
 
 	slog.Info("server starting", "port", cfg.App.Port, "env", cfg.App.Env)

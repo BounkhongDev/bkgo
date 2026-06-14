@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/bounkhongdev/kbgo/contract"
+	"github.com/BounkhongDev/bkgo/contract"
 )
 
 // Database is a test double for contract.Database.

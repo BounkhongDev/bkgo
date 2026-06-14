@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/bounkhongdev/kbgo/config"
-	"github.com/bounkhongdev/kbgo/contract"
+	"github.com/BounkhongDev/bkgo/config"
+	"github.com/BounkhongDev/bkgo/contract"
 	gojwt "github.com/golang-jwt/jwt/v5"
 )
 

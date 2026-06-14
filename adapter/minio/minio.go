@@ -6,7 +6,7 @@ import (
 	"io"
 	"time"
 
-	"github.com/bounkhongdev/kbgo/config"
+	"github.com/BounkhongDev/bkgo/config"
 	miniogo "github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 )

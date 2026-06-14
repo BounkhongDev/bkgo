@@ -9,13 +9,13 @@ Built by Bounkhong — designed so any Go backend project can plug in and go.
 ## Install the package
 
 ```bash
-go get github.com/bounkhongdev/kbgo
+go get github.com/BounkhongDev/bkgo
 ```
 
 ## Install the CLI
 
 ```bash
-go install github.com/bounkhongdev/kbgo/cmd/kbgo@latest
+go install github.com/BounkhongDev/bkgo/cmd/kbgo@latest
 ```
 
 ---
@@ -89,7 +89,7 @@ kbgo remove repository product   # deletes internal/product/repository.go
 ### Config
 
 ```go
-import "github.com/bounkhongdev/kbgo/config"
+import "github.com/BounkhongDev/bkgo/config"
 
 cfg, err := config.Load()          // reads from .env
 cfg, err := config.Load(".env.prod") // custom file
@@ -99,14 +99,20 @@ cfg, err := config.Load(".env.prod") // custom file
 
 ```go
 import (
-    "github.com/bounkhongdev/kbgo/adapter/postgres"
-    "github.com/bounkhongdev/kbgo/adapter/redis"
-    "github.com/bounkhongdev/kbgo/adapter/minio"
-    "github.com/bounkhongdev/kbgo/adapter/jwt"
+    gormadapter "github.com/BounkhongDev/bkgo/adapter/gorm"  // default (GORM)
+    "github.com/BounkhongDev/bkgo/adapter/postgres"           // raw SQL alternative
+    "github.com/BounkhongDev/bkgo/adapter/redis"
+    "github.com/BounkhongDev/bkgo/adapter/minio"
+    "github.com/BounkhongDev/bkgo/adapter/jwt"
 )
 
+// GORM (default) — satisfies contract.ORM
+db, err    := gormadapter.New(cfg.Postgres)
+
+// Raw SQL — satisfies contract.Database and contract.Transactional
 db, err    := postgres.New(ctx, cfg.Postgres)
-cache, err := redis.New(ctx, cfg.Redis)
+
+cache, err := redis.New(cfg.Redis)
 store, err := minio.New(ctx, cfg.MinIO)
 token      := jwt.New(cfg.JWT)
 ```
@@ -116,7 +122,7 @@ token      := jwt.New(cfg.JWT)
 Your business logic depends only on these interfaces — never on the adapters directly:
 
 ```go
-import "github.com/bounkhongdev/kbgo/contract"
+import "github.com/BounkhongDev/bkgo/contract"
 
 type UserRepository interface {
     // uses contract.Database, not *pgxpool.Pool
@@ -130,7 +136,7 @@ Swap PostgreSQL for MySQL → zero changes to your business logic.
 ### Response
 
 ```go
-import "github.com/bounkhongdev/kbgo/response"
+import "github.com/BounkhongDev/bkgo/response"
 
 c.JSON(response.Success(data))
 c.JSON(response.Paginated(list, page, limit, total))
@@ -140,7 +146,7 @@ c.JSON(response.Error("NOT_FOUND", "user not found"))
 ### Errors
 
 ```go
-import "github.com/bounkhongdev/kbgo/errs"
+import "github.com/BounkhongDev/bkgo/errs"
 
 return errs.NotFound("user not found")
 return errs.BadRequest("invalid email")
@@ -155,7 +161,7 @@ if ae, ok := errs.IsAppError(err); ok {
 ### Logger
 
 ```go
-import "github.com/bounkhongdev/kbgo/logger"
+import "github.com/BounkhongDev/bkgo/logger"
 
 log := logger.Development()   // debug + text output
 log := logger.Production()    // info  + JSON output
@@ -165,7 +171,7 @@ slog.SetDefault(log)
 ### Middleware
 
 ```go
-import "github.com/bounkhongdev/kbgo/middleware"
+import "github.com/BounkhongDev/bkgo/middleware"
 
 // Global CORS
 app.Use(middleware.CORS())
@@ -188,7 +194,7 @@ userID := claims["user_id"].(string)
 ### Validator
 
 ```go
-import "github.com/bounkhongdev/kbgo/validator"
+import "github.com/BounkhongDev/bkgo/validator"
 
 type CreateUserInput struct {
     Name  string `validate:"required,min=2"`
@@ -241,7 +247,7 @@ func (r *orderRepo) CreateWithInventory(ctx context.Context, order *Order) error
 ### Hash
 
 ```go
-import "github.com/bounkhongdev/kbgo/hash"
+import "github.com/BounkhongDev/bkgo/hash"
 
 hashed, err := hash.Password("mysecret")
 ok          := hash.CheckPassword("mysecret", hashed)
@@ -252,7 +258,7 @@ ok          := hash.CheckPassword("mysecret", hashed)
 Built-in locales: `en`, `lo` (Lao), `th` (Thai), `zh` (Chinese).
 
 ```go
-import "github.com/bounkhongdev/kbgo/i18n"
+import "github.com/BounkhongDev/bkgo/i18n"
 
 // Auto-detect from Accept-Language header
 locale := i18n.FromHeader(c.Get("Accept-Language"))
@@ -286,7 +292,7 @@ The generated `handler.go` wires this automatically — every error response rea
 ### Paginate
 
 ```go
-import "github.com/bounkhongdev/kbgo/paginate"
+import "github.com/BounkhongDev/bkgo/paginate"
 
 p := paginate.Params{Page: 1, Limit: 20}
 p.Normalize()

@@ -4,9 +4,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/bounkhongdev/kbgo/adapter/jwt"
-	"github.com/bounkhongdev/kbgo/config"
-	"github.com/bounkhongdev/kbgo/contract"
+	"github.com/BounkhongDev/bkgo/adapter/jwt"
+	"github.com/BounkhongDev/bkgo/config"
+	"github.com/BounkhongDev/bkgo/contract"
 )
 
 func newJWT() *jwt.JWT {
