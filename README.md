@@ -1,4 +1,4 @@
-# kbgo
+# bkgo
 
 A production-ready Go backend foundation package following **Hexagonal Architecture (Ports & Adapters)**.
 
@@ -15,7 +15,7 @@ go get github.com/BounkhongDev/bkgo
 ## Install the CLI
 
 ```bash
-go install github.com/BounkhongDev/bkgo/cmd/kbgo@latest
+go install github.com/BounkhongDev/bkgo/cmd/bkgo@latest
 ```
 
 ---
@@ -25,8 +25,8 @@ go install github.com/BounkhongDev/bkgo/cmd/kbgo@latest
 ### Scaffold a new project
 
 ```bash
-kbgo new myapp
-kbgo new myapp --module github.com/yourname/myapp
+bkgo new myapp
+bkgo new myapp --module github.com/yourname/myapp
 ```
 
 Generates:
@@ -45,9 +45,9 @@ myapp/
 ### Generate a full module
 
 ```bash
-kbgo generate module user
-kbgo g module product
-kbgo g module orderItem   # supports camelCase / snake_case / kebab-case
+bkgo generate module user
+bkgo g module product
+bkgo g module orderItem   # supports camelCase / snake_case / kebab-case
 ```
 
 Generates:
@@ -62,24 +62,24 @@ internal/user/
 ### Generate individual files
 
 ```bash
-kbgo generate handler    product
-kbgo generate service    product
-kbgo generate repository product
+bkgo generate handler    product
+bkgo generate service    product
+bkgo generate repository product
 ```
 
 ### Remove a module
 
 ```bash
-kbgo remove module user          # deletes internal/user/ entirely
-kbgo rm module user              # same (rm alias)
+bkgo remove module user          # deletes internal/user/ entirely
+bkgo rm module user              # same (rm alias)
 ```
 
 ### Remove individual files
 
 ```bash
-kbgo remove handler    product   # deletes internal/product/handler.go
-kbgo remove service    product   # deletes internal/product/usecase.go
-kbgo remove repository product   # deletes internal/product/repository.go
+bkgo remove handler    product   # deletes internal/product/handler.go
+bkgo remove service    product   # deletes internal/product/usecase.go
+bkgo remove repository product   # deletes internal/product/repository.go
 ```
 
 ---
@@ -314,11 +314,11 @@ Your Project
     │
     └── cmd/api/main.go      ← wire everything together
             │
-            ├── kbgo/config        ← load env
-            ├── kbgo/adapter/postgres  ← satisfies contract.Database
-            ├── kbgo/adapter/redis     ← satisfies contract.Cache
-            ├── kbgo/adapter/minio     ← satisfies contract.Storage
-            └── kbgo/adapter/jwt       ← satisfies contract.Token
+            ├── bkgo/config        ← load env
+            ├── bkgo/adapter/postgres  ← satisfies contract.Database
+            ├── bkgo/adapter/redis     ← satisfies contract.Cache
+            ├── bkgo/adapter/minio     ← satisfies contract.Storage
+            └── bkgo/adapter/jwt       ← satisfies contract.Token
 ```
 
 ---
@@ -342,4 +342,4 @@ Your Project
 | `middleware` | Fiber middleware — JWT auth, RBAC, CORS |
 | `validator` | Request body validation (go-playground/validator) |
 | `mock` | Test doubles — Database, Cache, Storage, Token, Tx |
-| `cmd/kbgo` | CLI tool — scaffold & generate |
+| `cmd/bkgo` | CLI tool — scaffold & generate |
