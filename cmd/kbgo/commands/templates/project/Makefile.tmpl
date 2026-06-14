@@ -1,0 +1,28 @@
+.PHONY: run build migrate seed docker-up docker-down test tidy
+
+run:
+	go run cmd/api/main.go
+
+build:
+	go build -o bin/{{.Name}} cmd/api/main.go
+
+migrate:
+	@for f in migrations/*.sql; do \
+		echo "Running $$f"; \
+		psql "$$DATABASE_URL" -f "$$f"; \
+	done
+
+seed:
+	go run cmd/seed/main.go
+
+docker-up:
+	docker-compose up -d
+
+docker-down:
+	docker-compose down
+
+test:
+	go test ./...
+
+tidy:
+	go mod tidy

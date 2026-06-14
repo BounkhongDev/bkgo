@@ -1,0 +1,20 @@
+package {{.Package}}
+
+import "context"
+
+// {{.Name}} is the core domain entity.
+type {{.Name}} struct {
+	ID        string `json:"id"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
+}
+
+// {{.Name}}Repository is the port (interface) for {{.Name}} persistence.
+// Implement this with any database adapter.
+type {{.Name}}Repository interface {
+	FindByID(ctx context.Context, id string) (*{{.Name}}, error)
+	FindAll(ctx context.Context) ([]*{{.Name}}, error)
+	Create(ctx context.Context, entity *{{.Name}}) error
+	Update(ctx context.Context, entity *{{.Name}}) error
+	Delete(ctx context.Context, id string) error
+}

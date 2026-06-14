@@ -1,0 +1,74 @@
+package main
+
+import (
+	"context"
+	"log/slog"
+	"os"
+
+	"github.com/bounkhongdev/kbgo/adapter/jwt"
+	"github.com/bounkhongdev/kbgo/adapter/postgres"
+	"github.com/bounkhongdev/kbgo/adapter/redis"
+	"github.com/bounkhongdev/kbgo/config"
+	"github.com/bounkhongdev/kbgo/logger"
+	"github.com/bounkhongdev/kbgo/middleware"
+	"github.com/gofiber/fiber/v2"
+)
+
+func main() {
+	cfg, err := config.Load()
+	if err != nil {
+		slog.Error("config load failed", "error", err)
+		os.Exit(1)
+	}
+
+	log := logger.Development()
+	if cfg.App.Env == "production" {
+		log = logger.Production()
+	}
+	slog.SetDefault(log)
+
+	ctx := context.Background()
+
+	db, err := postgres.New(ctx, cfg.Postgres)
+	if err != nil {
+		slog.Error("postgres connect failed", "error", err)
+		os.Exit(1)
+	}
+	defer db.Close()
+
+	cache, err := redis.New(ctx, cfg.Redis)
+	if err != nil {
+		slog.Error("redis connect failed", "error", err)
+		os.Exit(1)
+	}
+	defer cache.Close()
+
+	token := jwt.New(cfg.JWT)
+
+	app := fiber.New(fiber.Config{AppName: cfg.App.Name})
+
+	// Global middleware
+	app.Use(middleware.CORS())
+
+	// Health check (public)
+	app.Get("/health", func(c *fiber.Ctx) error {
+		return c.JSON(fiber.Map{"status": "ok", "app": cfg.App.Name})
+	})
+
+	// Protected API routes
+	api := app.Group("/api/v1", middleware.JWT(token))
+
+	// TODO: register your module routes
+	// userHandler := user.NewUserHandler(user.NewUserUsecase(user.NewUserRepository(db)))
+	// userHandler.RegisterRoutes(api)
+	_ = api
+
+	_ = db
+	_ = cache
+
+	slog.Info("server starting", "port", cfg.App.Port, "env", cfg.App.Env)
+	if err := app.Listen(":" + cfg.App.Port); err != nil {
+		slog.Error("server error", "error", err)
+		os.Exit(1)
+	}
+}

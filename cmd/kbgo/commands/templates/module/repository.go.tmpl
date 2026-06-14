@@ -1,0 +1,67 @@
+package {{.Package}}
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/bounkhongdev/kbgo/contract"
+	"github.com/bounkhongdev/kbgo/errs"
+	"github.com/google/uuid"
+)
+
+type {{.LowerName}}Repository struct {
+	db contract.Database
+}
+
+func New{{.Name}}Repository(db contract.Database) {{.Name}}Repository {
+	return &{{.LowerName}}Repository{db: db}
+}
+
+func (r *{{.LowerName}}Repository) FindByID(ctx context.Context, id string) (*{{.Name}}, error) {
+	row := r.db.QueryRow(ctx,
+		`SELECT id, created_at, updated_at FROM {{.Table}} WHERE id = $1`, id)
+
+	var e {{.Name}}
+	if err := row.Scan(&e.ID, &e.CreatedAt, &e.UpdatedAt); err != nil {
+		return nil, errs.NotFound("{{.Name}} not found")
+	}
+	return &e, nil
+}
+
+func (r *{{.LowerName}}Repository) FindAll(ctx context.Context) ([]*{{.Name}}, error) {
+	rows, err := r.db.Query(ctx,
+		`SELECT id, created_at, updated_at FROM {{.Table}} ORDER BY created_at DESC`)
+	if err != nil {
+		return nil, fmt.Errorf("{{.LowerName}}Repo.FindAll: %w", err)
+	}
+	defer rows.Close()
+
+	var list []*{{.Name}}
+	for rows.Next() {
+		var e {{.Name}}
+		if err := rows.Scan(&e.ID, &e.CreatedAt, &e.UpdatedAt); err != nil {
+			return nil, err
+		}
+		list = append(list, &e)
+	}
+	return list, rows.Err()
+}
+
+func (r *{{.LowerName}}Repository) Create(ctx context.Context, entity *{{.Name}}) error {
+	entity.ID = uuid.NewString()
+	return r.db.Exec(ctx,
+		`INSERT INTO {{.Table}} (id) VALUES ($1)`,
+		entity.ID,
+	)
+}
+
+func (r *{{.LowerName}}Repository) Update(ctx context.Context, entity *{{.Name}}) error {
+	return r.db.Exec(ctx,
+		`UPDATE {{.Table}} SET updated_at = NOW() WHERE id = $1`,
+		entity.ID,
+	)
+}
+
+func (r *{{.LowerName}}Repository) Delete(ctx context.Context, id string) error {
+	return r.db.Exec(ctx, `DELETE FROM {{.Table}} WHERE id = $1`, id)
+}

@@ -1,0 +1,62 @@
+package {{.Package}}
+
+import "context"
+
+// {{.Name}}Usecase defines the business operations for {{.Name}}.
+type {{.Name}}Usecase interface {
+	GetByID(ctx context.Context, id string) (*{{.Name}}, error)
+	GetAll(ctx context.Context) ([]*{{.Name}}, error)
+	Create(ctx context.Context, input *Create{{.Name}}Input) (*{{.Name}}, error)
+	Update(ctx context.Context, id string, input *Update{{.Name}}Input) (*{{.Name}}, error)
+	Delete(ctx context.Context, id string) error
+}
+
+type Create{{.Name}}Input struct {
+	// TODO: define fields
+}
+
+type Update{{.Name}}Input struct {
+	// TODO: define fields
+}
+
+type {{.LowerName}}Usecase struct {
+	repo {{.Name}}Repository
+}
+
+func New{{.Name}}Usecase(repo {{.Name}}Repository) {{.Name}}Usecase {
+	return &{{.LowerName}}Usecase{repo: repo}
+}
+
+func (u *{{.LowerName}}Usecase) GetByID(ctx context.Context, id string) (*{{.Name}}, error) {
+	return u.repo.FindByID(ctx, id)
+}
+
+func (u *{{.LowerName}}Usecase) GetAll(ctx context.Context) ([]*{{.Name}}, error) {
+	return u.repo.FindAll(ctx)
+}
+
+func (u *{{.LowerName}}Usecase) Create(ctx context.Context, input *Create{{.Name}}Input) (*{{.Name}}, error) {
+	entity := &{{.Name}}{
+		// TODO: map input to entity
+	}
+	if err := u.repo.Create(ctx, entity); err != nil {
+		return nil, err
+	}
+	return entity, nil
+}
+
+func (u *{{.LowerName}}Usecase) Update(ctx context.Context, id string, input *Update{{.Name}}Input) (*{{.Name}}, error) {
+	entity, err := u.repo.FindByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	// TODO: apply input to entity
+	if err := u.repo.Update(ctx, entity); err != nil {
+		return nil, err
+	}
+	return entity, nil
+}
+
+func (u *{{.LowerName}}Usecase) Delete(ctx context.Context, id string) error {
+	return u.repo.Delete(ctx, id)
+}

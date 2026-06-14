@@ -1,0 +1,96 @@
+package {{.Package}}_test
+
+import (
+	"context"
+	"testing"
+
+	"github.com/bounkhongdev/kbgo/contract"
+	"github.com/bounkhongdev/kbgo/errs"
+	"github.com/bounkhongdev/kbgo/mock"
+
+	"{{.Module}}/internal/{{.Package}}"
+)
+
+// setup returns a usecase wired to a mock database.
+func setup(db *mock.Database) {{.Package}}.{{.Name}}Usecase {
+	repo := {{.Package}}.New{{.Name}}Repository(db)
+	return {{.Package}}.New{{.Name}}Usecase(repo)
+}
+
+func TestGetByID_Found(t *testing.T) {
+	db := &mock.Database{
+		QueryRowFn: func(ctx context.Context, sql string, args ...any) contract.Row {
+			// Return a mock row with test values matching your Scan order in FindByID
+			return mock.NewRow("test-id-1", "2024-01-01T00:00:00Z", "2024-01-01T00:00:00Z")
+		},
+	}
+
+	uc := setup(db)
+	result, err := uc.GetByID(context.Background(), "test-id-1")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if result.ID != "test-id-1" {
+		t.Errorf("ID: want test-id-1 got %s", result.ID)
+	}
+}
+
+func TestGetByID_NotFound(t *testing.T) {
+	db := &mock.Database{
+		QueryRowFn: func(ctx context.Context, sql string, args ...any) contract.Row {
+			return mock.NewRowError(errs.NotFound("{{.Name}} not found"))
+		},
+	}
+
+	uc := setup(db)
+	_, err := uc.GetByID(context.Background(), "missing-id")
+	if err == nil {
+		t.Fatal("expected not-found error")
+	}
+	ae, ok := errs.IsAppError(err)
+	if !ok || ae.Code != "NOT_FOUND" {
+		t.Errorf("expected NOT_FOUND AppError, got: %v", err)
+	}
+}
+
+func TestCreate(t *testing.T) {
+	var executedSQL string
+	db := &mock.Database{
+		ExecFn: func(ctx context.Context, sql string, args ...any) error {
+			executedSQL = sql
+			return nil
+		},
+	}
+
+	uc := setup(db)
+	result, err := uc.Create(context.Background(), &{{.Package}}.Create{{.Name}}Input{
+		// TODO: fill in test input fields
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if result.ID == "" {
+		t.Error("expected a generated ID")
+	}
+	if executedSQL == "" {
+		t.Error("expected SQL to be executed")
+	}
+}
+
+func TestDelete(t *testing.T) {
+	called := false
+	db := &mock.Database{
+		ExecFn: func(ctx context.Context, sql string, args ...any) error {
+			called = true
+			return nil
+		},
+	}
+
+	uc := setup(db)
+	if err := uc.Delete(context.Background(), "some-id"); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if !called {
+		t.Error("expected Exec to be called")
+	}
+}

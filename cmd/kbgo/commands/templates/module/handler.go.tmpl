@@ -1,0 +1,95 @@
+package {{.Package}}
+
+import (
+	"log/slog"
+
+	"github.com/bounkhongdev/kbgo/errs"
+	"github.com/bounkhongdev/kbgo/i18n"
+	"github.com/bounkhongdev/kbgo/response"
+	"github.com/gofiber/fiber/v2"
+)
+
+type {{.Name}}Handler struct {
+	usecase {{.Name}}Usecase
+}
+
+func New{{.Name}}Handler(usecase {{.Name}}Usecase) *{{.Name}}Handler {
+	return &{{.Name}}Handler{usecase: usecase}
+}
+
+// RegisterRoutes wires all {{.Name}} routes onto the given fiber.Router.
+func (h *{{.Name}}Handler) RegisterRoutes(r fiber.Router) {
+	g := r.Group("/{{.Route}}")
+	g.Get("/", h.GetAll)
+	g.Get("/:id", h.GetByID)
+	g.Post("/", h.Create)
+	g.Put("/:id", h.Update)
+	g.Delete("/:id", h.Delete)
+}
+
+func (h *{{.Name}}Handler) GetAll(c *fiber.Ctx) error {
+	result, err := h.usecase.GetAll(c.Context())
+	if err != nil {
+		return httpErr(c, err)
+	}
+	return c.JSON(response.Success(result))
+}
+
+func (h *{{.Name}}Handler) GetByID(c *fiber.Ctx) error {
+	result, err := h.usecase.GetByID(c.Context(), c.Params("id"))
+	if err != nil {
+		return httpErr(c, err)
+	}
+	return c.JSON(response.Success(result))
+}
+
+func (h *{{.Name}}Handler) Create(c *fiber.Ctx) error {
+	var input Create{{.Name}}Input
+	if err := c.BodyParser(&input); err != nil {
+		return c.Status(400).JSON(response.Error("BAD_REQUEST", i18n.Translate(locale(c), "BAD_REQUEST")))
+	}
+	result, err := h.usecase.Create(c.Context(), &input)
+	if err != nil {
+		return httpErr(c, err)
+	}
+	return c.Status(201).JSON(response.Success(result))
+}
+
+func (h *{{.Name}}Handler) Update(c *fiber.Ctx) error {
+	var input Update{{.Name}}Input
+	if err := c.BodyParser(&input); err != nil {
+		return c.Status(400).JSON(response.Error("BAD_REQUEST", i18n.Translate(locale(c), "BAD_REQUEST")))
+	}
+	result, err := h.usecase.Update(c.Context(), c.Params("id"), &input)
+	if err != nil {
+		return httpErr(c, err)
+	}
+	return c.JSON(response.Success(result))
+}
+
+func (h *{{.Name}}Handler) Delete(c *fiber.Ctx) error {
+	if err := h.usecase.Delete(c.Context(), c.Params("id")); err != nil {
+		return httpErr(c, err)
+	}
+	return c.JSON(response.SuccessMessage("deleted"))
+}
+
+// locale reads the Accept-Language header and returns the best matching locale.
+func locale(c *fiber.Ctx) i18n.Locale {
+	return i18n.FromHeader(c.Get("Accept-Language"))
+}
+
+// httpErr maps an error to an HTTP response.
+// AppErrors are translated using the request locale.
+// Unexpected errors are logged server-side; a generic message is returned to the client.
+func httpErr(c *fiber.Ctx, err error) error {
+	if ae, ok := errs.IsAppError(err); ok {
+		msg := i18n.Translate(locale(c), ae.Code)
+		if msg == "" {
+			msg = ae.Message
+		}
+		return c.Status(ae.Status).JSON(response.Error(ae.Code, msg))
+	}
+	slog.Error("internal error", "error", err, "path", c.Path())
+	return c.Status(500).JSON(response.Error("INTERNAL_ERROR", i18n.Translate(locale(c), "INTERNAL_ERROR")))
+}
