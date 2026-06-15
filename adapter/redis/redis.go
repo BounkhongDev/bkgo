@@ -7,8 +7,11 @@ import (
 	"time"
 
 	"github.com/BounkhongDev/bkgo/config"
+	"github.com/BounkhongDev/bkgo/contract"
 	goredis "github.com/redis/go-redis/v9"
 )
+
+var _ contract.Cache = (*Cache)(nil)
 
 // Cache is the Redis adapter implementing contract.Cache.
 type Cache struct {
@@ -39,6 +42,7 @@ func (c *Cache) Set(ctx context.Context, key string, value any, ttl time.Duratio
 	return c.client.Set(ctx, key, data, ttl).Err()
 }
 
+// Get returns the raw JSON string stored by Set. Call json.Unmarshal to recover the original value.
 func (c *Cache) Get(ctx context.Context, key string) (string, error) {
 	return c.client.Get(ctx, key).Result()
 }

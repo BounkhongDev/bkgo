@@ -1,8 +1,16 @@
 package validator
 
-import "github.com/go-playground/validator/v10"
+import (
+	"errors"
+	"sync"
 
-var v = validator.New()
+	"github.com/go-playground/validator/v10"
+)
+
+var (
+	v  = validator.New()
+	mu sync.RWMutex
+)
 
 // FieldError holds a single field's validation error.
 type FieldError struct {
@@ -23,13 +31,20 @@ type FieldError struct {
 //	    return c.Status(422).JSON(response.Error("VALIDATION_FAILED", errs))
 //	}
 func Validate(s any) []FieldError {
+	mu.RLock()
 	err := v.Struct(s)
+	mu.RUnlock()
 	if err == nil {
 		return nil
 	}
 
+	var ve validator.ValidationErrors
+	if !errors.As(err, &ve) {
+		return []FieldError{{Field: "_", Message: err.Error()}}
+	}
+
 	var out []FieldError
-	for _, fe := range err.(validator.ValidationErrors) {
+	for _, fe := range ve {
 		out = append(out, FieldError{
 			Field:   fe.Field(),
 			Message: msgFor(fe),
@@ -39,11 +54,14 @@ func Validate(s any) []FieldError {
 }
 
 // RegisterTag registers a custom validation tag.
+// Must not be called concurrently with Validate — call at program init.
 //
 //	validator.RegisterTag("lao_phone", func(fl validator.FieldLevel) bool {
 //	    return strings.HasPrefix(fl.Field().String(), "020")
 //	})
 func RegisterTag(tag string, fn validator.Func) error {
+	mu.Lock()
+	defer mu.Unlock()
 	return v.RegisterValidation(tag, fn)
 }
 

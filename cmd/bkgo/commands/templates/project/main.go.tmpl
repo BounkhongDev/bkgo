@@ -36,6 +36,13 @@ func main() {
 	}
 	defer db.Close()
 
+	// TODO: register your domain models here for auto-migration
+	// e.g. after bkgo g module user → add &user.User{}
+	if err := db.Raw().AutoMigrate(); err != nil {
+		slog.Error("automigrate failed", "error", err)
+		os.Exit(1)
+	}
+
 	cache, err := redis.New(ctx, cfg.Redis)
 	if err != nil {
 		slog.Error("redis connect failed", "error", err)

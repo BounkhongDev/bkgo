@@ -9,7 +9,7 @@ import (
 
 var rootCmd = &cobra.Command{
 	Use:     "bkgo",
-	Version: "v0.2.6",
+	Version: "v0.2.7",
 	Short:   "bkgo — Go backend scaffolding CLI",
 	Long: `bkgo is a CLI for generating production-ready Go backend code
 following Hexagonal Architecture (Ports & Adapters).

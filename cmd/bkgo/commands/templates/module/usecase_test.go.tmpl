@@ -13,7 +13,7 @@ import (
 // Override only the methods your test uses — unset fields panic if called.
 type mock{{.Name}}Repo struct {
 	FindByIDFn func(ctx context.Context, id string) (*{{.Package}}.{{.Name}}, error)
-	FindAllFn  func(ctx context.Context) ([]*{{.Package}}.{{.Name}}, error)
+	FindAllFn  func(ctx context.Context, offset, limit int) ([]*{{.Package}}.{{.Name}}, int64, error)
 	CreateFn   func(ctx context.Context, entity *{{.Package}}.{{.Name}}) error
 	UpdateFn   func(ctx context.Context, entity *{{.Package}}.{{.Name}}) error
 	DeleteFn   func(ctx context.Context, id string) error
@@ -22,8 +22,8 @@ type mock{{.Name}}Repo struct {
 func (m *mock{{.Name}}Repo) FindByID(ctx context.Context, id string) (*{{.Package}}.{{.Name}}, error) {
 	return m.FindByIDFn(ctx, id)
 }
-func (m *mock{{.Name}}Repo) FindAll(ctx context.Context) ([]*{{.Package}}.{{.Name}}, error) {
-	return m.FindAllFn(ctx)
+func (m *mock{{.Name}}Repo) FindAll(ctx context.Context, offset, limit int) ([]*{{.Package}}.{{.Name}}, int64, error) {
+	return m.FindAllFn(ctx, offset, limit)
 }
 func (m *mock{{.Name}}Repo) Create(ctx context.Context, entity *{{.Package}}.{{.Name}}) error {
 	return m.CreateFn(ctx, entity)
@@ -98,6 +98,9 @@ func TestCreate(t *testing.T) {
 func TestDelete(t *testing.T) {
 	called := false
 	repo := &mock{{.Name}}Repo{
+		FindByIDFn: func(ctx context.Context, id string) (*{{.Package}}.{{.Name}}, error) {
+			return &{{.Package}}.{{.Name}}{ID: id}, nil
+		},
 		DeleteFn: func(ctx context.Context, id string) error {
 			called = true
 			return nil

@@ -7,9 +7,12 @@ import (
 	"time"
 
 	"github.com/BounkhongDev/bkgo/config"
+	"github.com/BounkhongDev/bkgo/contract"
 	miniogo "github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 )
+
+var _ contract.Storage = (*Storage)(nil)
 
 // Storage is the MinIO adapter implementing contract.Storage.
 type Storage struct {

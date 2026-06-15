@@ -10,6 +10,11 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+var (
+	_ contract.Database      = (*DB)(nil)
+	_ contract.Transactional = (*DB)(nil)
+)
+
 // DB is the PostgreSQL adapter implementing contract.Database.
 type DB struct {
 	pool *pgxpool.Pool

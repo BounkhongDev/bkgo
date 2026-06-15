@@ -9,7 +9,10 @@ import (
 	"gorm.io/gorm/logger"
 
 	"github.com/BounkhongDev/bkgo/config"
+	"github.com/BounkhongDev/bkgo/contract"
 )
+
+var _ contract.ORM = (*DB)(nil)
 
 // DB wraps *gorm.DB and satisfies contract.ORM.
 type DB struct {

@@ -3,10 +3,12 @@ package errs
 import "net/http"
 
 // AppError is a structured error with an HTTP status code and error code string.
+// Data carries optional structured payload (e.g. validation field errors).
 type AppError struct {
 	Status  int    `json:"-"`
 	Code    string `json:"error"`
 	Message string `json:"message"`
+	Data    any    `json:"data,omitempty"`
 }
 
 // Error implements the error interface on a value receiver so both
@@ -69,4 +71,9 @@ func Internal(msg string) *AppError {
 
 func Unprocessable(msg string) *AppError {
 	return New(http.StatusUnprocessableEntity, "UNPROCESSABLE", msg)
+}
+
+// UnprocessableFields returns a 422 error carrying structured field-level errors.
+func UnprocessableFields(msg string, fields any) *AppError {
+	return &AppError{Status: http.StatusUnprocessableEntity, Code: "UNPROCESSABLE", Message: msg, Data: fields}
 }

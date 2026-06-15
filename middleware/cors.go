@@ -11,7 +11,7 @@ type CORSConfig struct {
 
 var defaultCORSConfig = CORSConfig{
 	AllowOrigins: "*",
-	AllowMethods: "GET,POST,PUT,DELETE,OPTIONS",
+	AllowMethods: "GET,POST,PUT,PATCH,DELETE,OPTIONS",
 	AllowHeaders: "Origin,Content-Type,Authorization,Accept-Language",
 }
 

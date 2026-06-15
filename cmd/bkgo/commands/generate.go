@@ -137,8 +137,8 @@ func buildModuleData(name string) moduleData {
 		Package:   lower,
 		Name:      pascal,
 		LowerName: camel,
-		Route:     snake + "s",
-		Table:     snake + "s",
+		Route:     pluralRoute(snake),
+		Table:     pluralRoute(snake),
 	}
 }
 
@@ -158,7 +158,15 @@ func readModuleName() string {
 }
 
 func toPascalCase(s string) string {
-	s = strings.NewReplacer("_", " ", "-", " ").Replace(s)
+	// split camelCase/PascalCase on uppercase transitions: "UserProfile" → "User Profile"
+	var expanded strings.Builder
+	for i, r := range s {
+		if i > 0 && unicode.IsUpper(r) && !unicode.IsUpper(rune(s[i-1])) {
+			expanded.WriteRune(' ')
+		}
+		expanded.WriteRune(r)
+	}
+	s = strings.NewReplacer("_", " ", "-", " ").Replace(expanded.String())
 	words := strings.Fields(s)
 	for i, w := range words {
 		if len(w) > 0 {
@@ -166,6 +174,21 @@ func toPascalCase(s string) string {
 		}
 	}
 	return strings.Join(words, "")
+}
+
+func pluralRoute(snake string) string {
+	switch {
+	case strings.HasSuffix(snake, "y"):
+		return snake[:len(snake)-1] + "ies"
+	case strings.HasSuffix(snake, "s") ||
+		strings.HasSuffix(snake, "x") ||
+		strings.HasSuffix(snake, "z") ||
+		strings.HasSuffix(snake, "ch") ||
+		strings.HasSuffix(snake, "sh"):
+		return snake + "es"
+	default:
+		return snake + "s"
+	}
 }
 
 func toSnakeCase(s string) string {

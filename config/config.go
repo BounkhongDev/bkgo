@@ -56,7 +56,9 @@ type JWT struct {
 // and validates required fields. Accepts optional file paths; defaults to ".env".
 func Load(files ...string) (*Config, error) {
 	if len(files) > 0 {
-		_ = godotenv.Load(files...)
+		if err := godotenv.Load(files...); err != nil {
+			return nil, fmt.Errorf("config: load env file: %w", err)
+		}
 	} else {
 		_ = godotenv.Load()
 	}

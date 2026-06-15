@@ -9,6 +9,8 @@ import (
 	gojwt "github.com/golang-jwt/jwt/v5"
 )
 
+var _ contract.Token = (*JWT)(nil)
+
 // JWT is the JWT adapter implementing contract.Token.
 type JWT struct {
 	secret []byte

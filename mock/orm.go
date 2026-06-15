@@ -16,6 +16,9 @@ type ORM struct {
 }
 
 func (m *ORM) Session(ctx context.Context) *gorm.DB {
+	if m.SessionFn == nil {
+		panic("mock.ORM: SessionFn is not set")
+	}
 	return m.SessionFn(ctx)
 }
 
@@ -23,7 +26,9 @@ func (m *ORM) Transaction(ctx context.Context, fn func(tx *gorm.DB) error) error
 	if m.TransactionFn != nil {
 		return m.TransactionFn(ctx, fn)
 	}
-	// default: run fn with the same session (no real transaction in tests)
+	if m.SessionFn == nil {
+		panic("mock.ORM: SessionFn is not set (required by default Transaction fallback)")
+	}
 	return fn(m.SessionFn(ctx))
 }
 

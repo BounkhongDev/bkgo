@@ -101,7 +101,11 @@ func httpErr(c *fiber.Ctx, err error) error {
 		if msg == "" {
 			msg = ae.Message
 		}
-		return c.Status(ae.Status).JSON(response.Error(ae.Code, msg))
+		resp := response.Error(ae.Code, msg)
+		if ae.Data != nil {
+			resp.Data = ae.Data
+		}
+		return c.Status(ae.Status).JSON(resp)
 	}
 	slog.Error("internal error", "error", err, "path", c.Path())
 	return c.Status(500).JSON(response.Error("INTERNAL_ERROR", i18n.Translate(locale(c), "INTERNAL_ERROR")))

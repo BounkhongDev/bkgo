@@ -3,6 +3,7 @@ package {{.Package}}
 import (
 	"context"
 
+	"github.com/BounkhongDev/bkgo/errs"
 	"github.com/BounkhongDev/bkgo/paginate"
 	"github.com/BounkhongDev/bkgo/validator"
 )
@@ -42,8 +43,8 @@ func (u *{{.LowerName}}Usecase) List(ctx context.Context, p paginate.Params) ([]
 }
 
 func (u *{{.LowerName}}Usecase) Create(ctx context.Context, input *Create{{.Name}}Input) (*{{.Name}}, error) {
-	if err := validator.Validate(input); err != nil {
-		return nil, err
+	if fieldErrs := validator.Validate(input); len(fieldErrs) > 0 {
+		return nil, errs.UnprocessableFields("validation failed", fieldErrs)
 	}
 	entity := &{{.Name}}{
 		// TODO: map input to entity
@@ -55,8 +56,8 @@ func (u *{{.LowerName}}Usecase) Create(ctx context.Context, input *Create{{.Name
 }
 
 func (u *{{.LowerName}}Usecase) Update(ctx context.Context, id string, input *Update{{.Name}}Input) (*{{.Name}}, error) {
-	if err := validator.Validate(input); err != nil {
-		return nil, err
+	if fieldErrs := validator.Validate(input); len(fieldErrs) > 0 {
+		return nil, errs.UnprocessableFields("validation failed", fieldErrs)
 	}
 	entity, err := u.repo.FindByID(ctx, id)
 	if err != nil {
